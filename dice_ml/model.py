@@ -13,7 +13,7 @@ from dice_ml.constants import BackEndTypes, ModelTypes
 class Model:
     """An interface class to different ML Model implementations."""
     def __init__(self, model=None, model_path='', backend=BackEndTypes.Tensorflow1, model_type=ModelTypes.Classifier,
-                 func=None, kw_args=None):
+                 dtypes=None, func=None, kw_args=None):
         """Init method
 
         :param model: trained ML model.
@@ -27,6 +27,7 @@ class Model:
                         inside the subpackage dice_ml.model_interfaces, and dice interface class "DiceXGBoost"
                         in module "dice_xgboost" inside dice_ml.explainer_interfaces, then backend parameter
                         should be {"model": "xgboost_model.XGBoostModel", "explainer": dice_xgboost.DiceXGBoost}.
+        :param dtypes: used to manually set a pandas DataFrame column types before a get_output() prediction is made in the {"model": "lgbm_model.LgbmModel"}
         :param func: function transformation required for ML model. If func is None, then func will be the identity function.
         :param kw_args: Dictionary of additional keyword arguments to pass to func. DiCE's data_interface is appended
                         to the dictionary of kw_args, by default.
@@ -44,13 +45,13 @@ class Model:
         if model is None and model_path == '':
             raise ValueError("should provide either a trained model or the path to a model")
         else:
-            self.decide_implementation_type(model, model_path, backend, func, kw_args)
+            self.decide_implementation_type(model, model_path, backend, dtypes, func, kw_args)
 
-    def decide_implementation_type(self, model, model_path, backend, func, kw_args):
+    def decide_implementation_type(self, model, model_path, backend, dtypes, func, kw_args):
         """Decides the Model implementation type."""
 
         self.__class__ = decide(backend)
-        self.__init__(model, model_path, backend, func, kw_args)
+        self.__init__(model, model_path, backend, dtypes, func, kw_args)
 
 
 def decide(backend):
