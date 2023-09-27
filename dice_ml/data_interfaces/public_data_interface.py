@@ -392,14 +392,29 @@ class PublicData(_BaseData):
                 precisions[ix] = self.continuous_features_precision[col]
                 precisions_dict[col] = self.continuous_features_precision[col]
             elif self.data_df[col].dtype == np.float32 or self.data_df[col].dtype == np.float64:
+                
+                # modes = self.data_df[col].mode()
+                # maxp = len(str(modes[0]).split('.')[1])  # maxp stores the maximum precision of the modes
+                # for mx in range(len(modes)):
+                #     prec = len(str(modes[mx]).split('.')[1])
+                #     if prec > maxp:
+                #         maxp = prec
+                
+                ## Small fix for is a column contains only nans (just set precision to 1)
+                ## need a better solution!!
                 modes = self.data_df[col].mode()
-                maxp = len(str(modes[0]).split('.')[1])  # maxp stores the maximum precision of the modes
-                for mx in range(len(modes)):
-                    prec = len(str(modes[mx]).split('.')[1])
-                    if prec > maxp:
-                        maxp = prec
+                if len(modes) != 0:
+                    maxp = len(str(modes[0]).split('.')[1])  # maxp stores the maximum precision of the modes
+                    for mx in range(len(modes)):
+                        prec = len(str(modes[mx]).split('.')[1])
+                        if prec > maxp:
+                            maxp = prec
+                else:
+                    maxp = 1
+                
                 precisions[ix] = maxp
                 precisions_dict[col] = maxp
+                
         if output_type == "list":
             return precisions
         elif output_type == "dict":
